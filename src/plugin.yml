@@ -1,0 +1,23 @@
+name: Lockette
+main: org.soraworld.lockette.Lockette
+author: Himmelt,connection_lost
+softdepend: [WorldGuard, Residence, Towny, ProtocolLib, Factions]
+version: 1.7.10-0.0.1
+description: >
+             Lockette is a chest protection plugin for Bukkit. It is 100% compatible with original Lockette, but delivers a lot of performance enhancements and feature options.
+commands:
+   lockettepro:
+      permission: lockettepro.command
+      usage: |
+         /lock
+      aliases: [lock, lockette, lockit]
+permissions:
+   lockettepro.command:
+      description: Command permission for Lockette
+      default: true
+   lockettepro.lock:
+      description: Basic lock permission
+      default: true
+   lockettepro.edit:
+      description: Edit sign permission
+      default: true
