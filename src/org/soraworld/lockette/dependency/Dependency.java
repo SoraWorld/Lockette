@@ -1,4 +1,4 @@
-package org.soraworld.lockette;
+package org.soraworld.lockette.dependency;
 
 import com.bekvon.bukkit.residence.Residence;
 import com.massivecraft.factions.entity.BoardColl;
@@ -15,21 +15,23 @@ import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.soraworld.lockette.log.Logger;
 
 public class Dependency {
 
-    protected static WorldGuardPlugin worldguard = null;
+    protected static WorldGuardPlugin worldGuard = null;
     protected static Plugin residence = null;
     protected static Plugin towny = null;
     protected static Plugin factions = null;
 
+    // get dependencies
     public Dependency(Plugin plugin) {
         // WorldGuard
-        Plugin worldguardplugin = plugin.getServer().getPluginManager().getPlugin("WorldGuard");
-        if (worldguardplugin == null || !(worldguardplugin instanceof WorldGuardPlugin)) {
-            worldguard = null;
+        Plugin worldGuardPlugin = plugin.getServer().getPluginManager().getPlugin("WorldGuard");
+        if (worldGuardPlugin == null || !(worldGuardPlugin instanceof WorldGuardPlugin)) {
+            worldGuard = null;
         } else {
-            worldguard = (WorldGuardPlugin) worldguardplugin;
+            worldGuard = (WorldGuardPlugin) worldGuardPlugin;
         }
         // Residence
         residence = plugin.getServer().getPluginManager().getPlugin("Residence");
@@ -41,8 +43,8 @@ public class Dependency {
 
     @SuppressWarnings("deprecation")
     public static boolean isProtectedFrom(Block block, Player player) {
-        if (worldguard != null) {
-            if (!worldguard.canBuild(player, block)) return true;
+        if (worldGuard != null) {
+            if (!worldGuard.canBuild(player, block)) return true;
         }
         if (residence != null) {
             if (!Residence.getPermsByLoc(block.getLocation()).playerHas(player.getName(), player.getWorld().getName(), "build", true))
@@ -56,10 +58,12 @@ public class Dependency {
                         return true;
                     // Wilderness permissions
                     if (TownyUniverse.isWilderness(block)) { // It is wilderness here
-                        if (!player.hasPermission("lockettepro.towny.wilds")) return true;
+                        if (!player.hasPermission("lockette.towny.wilds")) return true;
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
+                Logger.info(e.toString());
             }
         }
         if (factions != null) {
@@ -68,13 +72,15 @@ public class Dependency {
                 if (faction != null && !faction.isNone()) {
                     MPlayer mplayer = MPlayer.get(player);
                     if (mplayer != null && !mplayer.isOverriding()) {
-                        Faction playerfaction = mplayer.getFaction();
-                        if (faction != playerfaction) {
+                        Faction playerFaction = mplayer.getFaction();
+                        if (faction != playerFaction) {
                             return true;
                         }
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
+                Logger.info(e.toString());
             }
         }
         return false;
@@ -90,6 +96,8 @@ public class Dependency {
                 Nation nation = town.getNation();
                 if (line.equals("[" + nation.getName() + "]")) return true;
             } catch (Exception e) {
+                e.printStackTrace();
+                Logger.info(e.toString());
             }
         }
         if (factions != null) {
@@ -102,6 +110,8 @@ public class Dependency {
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
+                Logger.info(e.toString());
             }
         }
         return false;

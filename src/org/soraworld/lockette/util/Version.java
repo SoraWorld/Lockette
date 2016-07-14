@@ -1,4 +1,4 @@
-package org.soraworld.lockette;
+package org.soraworld.lockette.util;
 
 public enum Version {
 

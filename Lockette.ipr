@@ -196,8 +196,22 @@
   <component name="ProjectDictionaryState">
     <dictionary name="Kami">
       <words>
+        <w>closetime</w>
+        <w>datas</w>
+        <w>guid</w>
+        <w>liness</w>
+        <w>linetime</w>
+        <w>lockables</w>
         <w>lockette</w>
+        <w>lockothers</w>
+        <w>mcstats</w>
+        <w>minecart</w>
+        <w>mojang</w>
+        <w>rawline</w>
         <w>redstone</w>
+        <w>timersingle</w>
+        <w>topline</w>
+        <w>towrite</w>
       </words>
     </dictionary>
   </component>

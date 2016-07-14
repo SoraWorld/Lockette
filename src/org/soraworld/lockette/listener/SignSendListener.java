@@ -1,8 +1,11 @@
-package org.soraworld.lockette;
+package org.soraworld.lockette.listener;
 
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.soraworld.lockette.api.LocketteAPI;
+import org.soraworld.lockette.event.SignSendEvent;
+import org.soraworld.lockette.util.Utils;
 
 public class SignSendListener implements Listener {
 

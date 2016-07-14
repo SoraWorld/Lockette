@@ -8,14 +8,20 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.mcstats.MetricsLite;
+import org.soraworld.lockette.api.LocketteAPI;
+import org.soraworld.lockette.config.Config;
+import org.soraworld.lockette.dependency.Dependency;
+import org.soraworld.lockette.dependency.DependencyProtocolLib;
+import org.soraworld.lockette.listener.*;
+import org.soraworld.lockette.log.Logger;
+import org.soraworld.lockette.util.Utils;
+import org.soraworld.lockette.util.Version;
 
 public class Lockette extends JavaPlugin {
 
-    private static Lockette plugin;
+    private static Plugin plugin;
     private static Version version = Version.UNKNOWN;
     private boolean debug = false;
-//	private static boolean needcheckhand = false;
 
     public static Plugin getPlugin() {
         return plugin;
@@ -29,6 +35,8 @@ public class Lockette extends JavaPlugin {
         plugin = this;
         // Read config
         new Config(this);
+        // Create Logger
+        new Logger(this);
         // Register Listeners
         // If debug mode is not on, debug listener won't register
         if (debug) getServer().getPluginManager().registerEvents(new BlockDebugListener(), this);
@@ -37,29 +45,7 @@ public class Lockette extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BlockInventoryMoveListener(), this);
         // Dependency
         new Dependency(this);
-//    	// Version
-//    	String versionname = "v" + Bukkit.getServer().getClass().getPackage().getName().split("v")[1];
-//    	try {
-//        	version = Version.valueOf(versionname);
-//    	} catch (Exception ex){
-//    		version = Version.UNKNOWN;
-//    	}
-//		// Bukkit-1.7.10 不在版本列表,无需检查手持
-//    	switch (version){
-//		case v1_9_R1:
-//		case v1_9_R2:
-//		case v1_10_R1:
-//			needcheckhand = true;
-//			break;
-//		case v1_8_R1:
-//		case v1_8_R2:
-//		case v1_8_R3:
-//		case UNKNOWN:
-//		default:
-//			needcheckhand = false;
-//			break;
-//    	}
-        // If UUID is not enabled, UUID listener won't register
+
         if (Config.isUuidEnabled()) {
             if (Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
                 DependencyProtocolLib.setUpProtocolLib(this);
@@ -69,17 +55,7 @@ public class Lockette extends JavaPlugin {
                 plugin.getLogger().info("UUID support requires ProtocolLib, or else signs will be ugly!");
             }
         }
-        // Metrics
-        try {
-            MetricsLite metrics = new MetricsLite(this);
-            metrics.start();
-        } catch (Exception ex) {
-        }
     }
-
-//    public static boolean needCheckHand(){
-//    	return needcheckhand;
-//    }
 
     public void onDisable() {
         if (Config.isUuidEnabled() && Bukkit.getPluginManager().getPlugin("ProtocolLib") != null) {
@@ -88,14 +64,14 @@ public class Lockette extends JavaPlugin {
     }
 
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, final String[] args) {
-        if (cmd.getName().equals("lockettepro")) {
+        if (cmd.getName().equals("lockette")) {
             if (args.length == 0) {
                 Utils.sendMessages(sender, Config.getLang("command-usage"));
             } else {
                 // The following commands does not require player
                 switch (args[0]) {
                     case "reload":
-                        if (sender.hasPermission("lockettepro.reload")) {
+                        if (sender.hasPermission("lockette.reload")) {
                             Config.reload();
                             Utils.sendMessages(sender, Config.getLang("config-reloaded"));
                         } else {
@@ -103,7 +79,7 @@ public class Lockette extends JavaPlugin {
                         }
                         return true;
                     case "version":
-                        if (sender.hasPermission("lockettepro.version")) {
+                        if (sender.hasPermission("lockette.version")) {
                             sender.sendMessage(plugin.getDescription().getFullName());
                         } else {
                             Utils.sendMessages(sender, Config.getLang("no-permission"));
@@ -121,7 +97,7 @@ public class Lockette extends JavaPlugin {
                     case "2":
                     case "3":
                     case "4":
-                        if (player.hasPermission("lockettepro.edit")) {
+                        if (player.hasPermission("lockette.edit")) {
                             String message = "";
 //    					if (args.length == 1){
 //    						message = "";
@@ -129,7 +105,7 @@ public class Lockette extends JavaPlugin {
                             Block block = Utils.getSelectedSign(player);
                             if (block == null) {
                                 Utils.sendMessages(player, Config.getLang("no-sign-selected"));
-                            } else if (!LocketteAPI.isSign(block) || !(player.hasPermission("lockettepro.edit.admin") || LocketteAPI.isOwnerOfSign(block, player))) {
+                            } else if (!LocketteAPI.isSign(block) || !(player.hasPermission("lockette.edit.admin") || LocketteAPI.isOwnerOfSign(block, player))) {
                                 Utils.sendMessages(player, Config.getLang("sign-need-reselect"));
                             } else {
                                 for (int i = 1; i < args.length; i++) {
@@ -146,7 +122,7 @@ public class Lockette extends JavaPlugin {
                                             Utils.sendMessages(player, Config.getLang("cannot-change-this-line"));
                                             break;
                                         case "2":
-                                            if (!player.hasPermission("lockettepro.admin.edit")) {
+                                            if (!player.hasPermission("lockette.admin.edit")) {
                                                 Utils.sendMessages(player, Config.getLang("cannot-change-this-line"));
                                                 break;
                                             }
@@ -183,17 +159,17 @@ public class Lockette extends JavaPlugin {
                         }
                         break;
                     case "force":
-                        if (debug && player.hasPermission("lockettepro.debug")) {
+                        if (debug && player.hasPermission("lockette.debug")) {
                             Utils.setSignLine(Utils.getSelectedSign(player), Integer.parseInt(args[1]), args[2]);
                             break;
                         }
                     case "update":
-                        if (debug && player.hasPermission("lockettepro.debug")) {
+                        if (debug && player.hasPermission("lockette.debug")) {
                             Utils.updateSign(Utils.getSelectedSign(player));
                             break;
                         }
                     case "uuid":
-                        if (debug && player.hasPermission("lockettepro.debug")) {
+                        if (debug && player.hasPermission("lockette.debug")) {
                             Utils.updateUuidOnSign(Utils.getSelectedSign(player));
                             break;
                         }

@@ -1,39 +1,50 @@
-# Configuration file
-# https://github.com/connection-lost/LockettePro/wiki/*-config.yml
-# If there are missing entries, you can add them manually.
-
-language-file-name: 'lang.yml'
-enable-quick-protect: true
-enable-uuid-support: false
-block-interfere-placement: true
-block-item-transfer-in: false
-block-item-transfer-out: true
+# 配置文件
+---
+# 默认语言文件
+language-file: lang_en_us.yml
+# 是否启用支持UUID
+enable-uuid: false
+# 爆炸保护
+explosion-protection: true
+# 漏斗、矿车
 block-hopper-minecart: remove
+# ？？？？
+block-interfere-placement: true
+# 物品运输-进
+block-item-transfer-in: false
+# 物品运输-出
+block-item-transfer-out: true
+# 缓存（秒）
 cache-time-seconds: 0
+---
+# 私有标记
 private-signs:
-- '[Private]'
-- '[private]'
-additional-signs:
-- '[More Users]'
-- '[more users]'
+  - "[Private]"
+  - "[private]"
+# 更多人标记
+more-signs:
+  - "[More Users]"
+  - "[more users]"
+# 所有人标记
 everyone-signs:
-- '[Everyone]'
-- '[everyone]'
+  - "[Everyone]"
+  - "[everyone]"
+# 时间标记
 timer-signs:
-- '[Timer:@]'
-- '[timer:@]'
+  - "[Timer:@]"
+  - "[timer:@]"
+# 名称前缀
+name-prefix:
+  - ""
+# 保护对象列表
 lockables:
-- CHEST
-- TRAPPED_CHEST
-- FURNACE
-- BURNING_FURNACE
-- HOPPER
-- BREWING_STAND
-- DIAMOND_BLOCK
-- WOODEN_DOOR
-- SPRUCE_DOOR
-- BIRCH_DOOR
-- JUNGLE_DOOR
-- ACACIA_DOOR
-- DARK_OAK_DOOR
-- IRON_DOOR_BLOCK
+  - CHEST
+  - TRAPPED_CHEST
+  - FURNACE
+  - BURNING_FURNACE
+  - HOPPER
+  - BREWING_STAND
+  - DIAMOND_BLOCK
+  - WOODEN_DOOR
+  - IRON_DOOR_BLOCK
+  - IRON_DOOR_BLOCK

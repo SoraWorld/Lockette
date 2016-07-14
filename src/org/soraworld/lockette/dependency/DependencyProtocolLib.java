@@ -1,4 +1,4 @@
-package org.soraworld.lockette;
+package org.soraworld.lockette.dependency;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -11,6 +11,8 @@ import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.comphenix.protocol.wrappers.nbt.NbtFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.soraworld.lockette.Lockette;
+import org.soraworld.lockette.event.SignSendEvent;
 
 import java.util.List;
 
@@ -101,9 +103,9 @@ public class DependencyProtocolLib {
             @Override
             public void onPacketSending(PacketEvent event) {
                 PacketContainer packet = event.getPacket();
-                List<?> tileentitydatas = packet.getSpecificModifier(List.class).read(0);
-                for (Object tileentitydata : tileentitydatas) {
-                    NbtCompound nbtcompound = NbtFactory.fromNMSCompound(tileentitydata);
+                List<?> tileEntityDatas = packet.getSpecificModifier(List.class).read(0);
+                for (Object tileEntityData : tileEntityDatas) {
+                    NbtCompound nbtcompound = NbtFactory.fromNMSCompound(tileEntityData);
                     if (nbtcompound == null || nbtcompound.getString("id") == null || !nbtcompound.getString("id").equals("Sign"))
                         continue;
                     String[] liness = new String[4];
@@ -121,6 +123,5 @@ public class DependencyProtocolLib {
             }
         });
     }
-
 
 }

@@ -1,4 +1,4 @@
-package org.soraworld.lockette;
+package org.soraworld.lockette.util;
 
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.google.gson.JsonObject;
@@ -13,6 +13,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.soraworld.lockette.Lockette;
+import org.soraworld.lockette.api.LocketteAPI;
+import org.soraworld.lockette.config.Config;
+import org.soraworld.lockette.log.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -22,16 +26,16 @@ import java.util.*;
 
 public class Utils {
 
-    public static final String usernamepattern = "^[a-zA-Z0-9_]*$";
+    public static final String usernamePattern = "^[a-zA-Z0-9_]*$";
 
-    private static Map<Player, Block> selectedsign = new HashMap<Player, Block>();
-    private static Set<Player> notified = new HashSet<Player>();
+    private static Map<Player, Block> selectedSign = new HashMap<>();
+    private static Set<Player> notified = new HashSet<>();
 
     // Helper functions
     @SuppressWarnings("deprecation")
     public static void putSignOn(Block block, BlockFace blockface, String line1, String line2) {
-        Block newsign = block.getRelative(blockface);
-        newsign.setType(Material.WALL_SIGN);
+        Block newSign = block.getRelative(blockface);
+        newSign.setType(Material.WALL_SIGN);
         byte data = 0;
         // So this part is pretty much a Bukkit bug:
         // Signs' rotation is not correct with bukkit's set facing, below is the workaround.
@@ -51,16 +55,16 @@ public class Utils {
             default:
                 return;
         }
-        newsign.setData(data, true);
-        updateSign(newsign);
-        Sign sign = (Sign) newsign.getState();
-        Lockette.getPlugin().getLogger().info("5!!!!!!!!!!!:" + line1);
+        newSign.setData(data, true);
+        updateSign(newSign);
+        Sign sign = (Sign) newSign.getState();
         sign.setLine(0, line1);
-        sign.setLine(1, "§b§l" + line2);
+        sign.setLine(1, line2);
         sign.update();
     }
 
-    public static void setSignLine(Block block, int line, String text) { // Requires isSign
+    public static void setSignLine(Block block, int line, String text) {
+        // Requires isSign
         Sign sign = (Sign) block.getState();
         sign.setLine(line, text);
         sign.update();
@@ -80,11 +84,11 @@ public class Utils {
     }
 
     public static Block getSelectedSign(Player player) {
-        return selectedsign.get(player);
+        return selectedSign.get(player);
     }
 
     public static void selectSign(Player player, Block block) {
-        selectedsign.put(player, block);
+        selectedSign.put(player, block);
     }
 
     public static void playLockEffect(Player player, Block block) {
@@ -112,9 +116,9 @@ public class Utils {
     }
 
     public static boolean hasValidCache(Block block) {
-        List<MetadataValue> metadatas = block.getMetadata("expires");
-        if (!metadatas.isEmpty()) {
-            long expires = metadatas.get(0).asLong();
+        List<MetadataValue> metaDatas = block.getMetadata("expires");
+        if (!metaDatas.isEmpty()) {
+            long expires = metaDatas.get(0).asLong();
             if (expires > System.currentTimeMillis()) {
                 return true;
             }
@@ -122,9 +126,10 @@ public class Utils {
         return false;
     }
 
-    public static boolean getAccess(Block block) { // Requires hasValidCache()
-        List<MetadataValue> metadatas = block.getMetadata("locked");
-        return metadatas.get(0).asBoolean();
+    public static boolean getAccess(Block block) {
+        // Requires hasValidCache()
+        List<MetadataValue> metaDatas = block.getMetadata("locked");
+        return metaDatas.get(0).asBoolean();
     }
 
     public static void setCache(Block block, boolean access) {
@@ -137,7 +142,7 @@ public class Utils {
     public static void resetCache(Block block) {
         block.removeMetadata("expires", Lockette.getPlugin());
         block.removeMetadata("locked", Lockette.getPlugin());
-        for (BlockFace blockface : LocketteAPI.newsfaces) {
+        for (BlockFace blockface : LocketteAPI.newsFaces) {
             Block relative = block.getRelative(blockface);
             if (relative.getType() == block.getType()) {
                 relative.removeMetadata("expires", Lockette.getPlugin());
@@ -155,30 +160,24 @@ public class Utils {
     public static void updateUuidByUsername(final Block block, final int line) {
         Sign sign = (Sign) block.getState();
         final String original = sign.getLine(line);
-        Bukkit.getScheduler().runTaskAsynchronously(Lockette.getPlugin(), new Runnable() {
-            @Override
-            public void run() {
-                String username = original;
-                if (username.contains("#")) {
-                    username = username.split("#")[0];
-                }
-                if (!isUserName(username)) return;
-                String uuid = null;
-                Player user = Bukkit.getPlayerExact(username);
-                if (user != null) { // User is online
-                    uuid = user.getUniqueId().toString();
-                } else { // User is not online, fetch string
-                    uuid = getUuidByUsernameFromMojang(username);
-                }
-                if (uuid != null) {
-                    final String towrite = username + "#" + uuid;
-                    Bukkit.getScheduler().runTask(Lockette.getPlugin(), new Runnable() {
-                        @Override
-                        public void run() {
-                            setSignLine(block, line, towrite);
-                        }
-                    });
-                }
+        Bukkit.getScheduler().runTaskAsynchronously(Lockette.getPlugin(), () -> {
+            String username = original;
+            if (username.contains("#")) {
+                username = username.split("#")[0];
+            }
+            if (!isUserName(username)) return;
+            String uuid = null;
+            Player user = Bukkit.getPlayerExact(username);
+            if (user != null) {
+                // User is online
+                uuid = user.getUniqueId().toString();
+            } else {
+                // User is not online, fetch string
+                uuid = getUuidByUsernameFromMojang(username);
+            }
+            if (uuid != null) {
+                final String towrite = username + "#" + uuid;
+                Bukkit.getScheduler().runTask(Lockette.getPlugin(), () -> setSignLine(block, line, towrite));
             }
         });
     }
@@ -188,7 +187,10 @@ public class Utils {
         String original = sign.getLine(line);
         if (isUsernameUuidLine(original)) {
             String uuid = getUuidFromLine(original);
-            Player player = Bukkit.getPlayer(UUID.fromString(uuid));
+            Player player = null;
+            if (uuid != null) {
+                player = Bukkit.getPlayer(UUID.fromString(uuid));
+            }
             if (player != null) {
                 setSignLine(block, line, player.getName() + "#" + uuid);
             }
@@ -200,7 +202,7 @@ public class Utils {
     }
 
     public static boolean isUserName(String text) {
-        return text.length() < 17 && text.length() > 2 && text.matches(usernamepattern);
+        return text.length() < 17 && text.length() > 2 && text.matches(usernamePattern);
     }
 
     // Warning: don't use this in a sync way
@@ -212,23 +214,25 @@ public class Utils {
             connection.setReadTimeout(8000);
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
-            StringBuffer response = new StringBuffer();
+            StringBuilder response = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }
-            String responsestring = response.toString();
-            JsonObject json = new JsonParser().parse(responsestring).getAsJsonObject();
-            String rawuuid = json.get("id").getAsString();
-            return rawuuid.substring(0, 8) + "-" + rawuuid.substring(8, 12) + "-" + rawuuid.substring(12, 16) + "-" + rawuuid.substring(16, 20) + "-" + rawuuid.substring(20);
+            String responseString = response.toString();
+            JsonObject json = new JsonParser().parse(responseString).getAsJsonObject();
+            String rawUUID = json.get("id").getAsString();
+            return rawUUID.substring(0, 8) + "-" + rawUUID.substring(8, 12) + "-" + rawUUID.substring(12, 16) + "-" + rawUUID.substring(16, 20) + "-" + rawUUID.substring(20);
         } catch (Exception ex) {
+            ex.printStackTrace();
+            Logger.info(ex.toString());
         }
         return null;
     }
 
     public static boolean isUsernameUuidLine(String text) {
         if (text.contains("#")) {
-            String[] splitted = text.split("#", 2);
-            if (splitted[1].length() == 36) {
+            String[] splits = text.split("#", 2);
+            if (splits[1].length() == 36) {
                 return true;
             }
         }
@@ -273,11 +277,15 @@ public class Utils {
             JsonObject line = new JsonParser().parse(json).getAsJsonObject();
             return line.get("extra").getAsJsonArray().get(0).getAsString();
         } catch (Exception ex) {
+            ex.printStackTrace();
+            Logger.info(ex.toString());
         }
         try { // 1.9+
             JsonObject line = new JsonParser().parse(json).getAsJsonObject();
             return line.get("extra").getAsJsonArray().get(0).getAsJsonObject().get("text").getAsString();
         } catch (Exception ex) {
+            ex.printStackTrace();
+            Logger.info(ex.toString());
         }
         return json;
     }

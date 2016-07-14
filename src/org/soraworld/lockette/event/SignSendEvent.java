@@ -1,4 +1,4 @@
-package org.soraworld.lockette;
+package org.soraworld.lockette.event;
 
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import org.bukkit.entity.Player;
@@ -30,11 +30,11 @@ public class SignSendEvent extends Event {
     }
 
     public WrappedChatComponent[] getLinesWrappedChatComponent() {
-        WrappedChatComponent[] wrappedchatcomponent = new WrappedChatComponent[4];
+        WrappedChatComponent[] wrappedChatComponent = new WrappedChatComponent[4];
         for (int i = 0; i < 4; i++) {
-            wrappedchatcomponent[i] = WrappedChatComponent.fromJson(lines[i]);
+            wrappedChatComponent[i] = WrappedChatComponent.fromJson(lines[i]);
         }
-        return wrappedchatcomponent;
+        return wrappedChatComponent;
     }
 
     public void setLine(int linenumber, String text) {

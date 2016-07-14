@@ -1,4 +1,4 @@
-package org.soraworld.lockette;
+package org.soraworld.lockette.listener;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -10,6 +10,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.soraworld.lockette.api.LocketteAPI;
 
 public class BlockDebugListener implements Listener {
 
@@ -29,39 +30,14 @@ public class BlockDebugListener implements Listener {
             p.sendMessage("isLockedUpDownLockedDoor: " + formatBoolean(LocketteAPI.isUpDownLockedDoor(b)));
             p.sendMessage(" - isOwner/UserSingle: " + formatBoolean(LocketteAPI.isOwnerUpDownLockedDoor(b, p)) + ChatColor.RESET + "/" + formatBoolean(LocketteAPI.isOwnerUpDownLockedDoor(b, p)));
 
-//			p.sendMessage("isLockSign: " + formatBoolean(LocketteAPI.isLockSign(b)));
-//			if (LocketteAPI.isLockSign(b)){
-//				p.sendMessage(" - isOwnerOnSign: " + formatBoolean(LocketteAPI.isOwnerOnSign(b, p.getName())));
-//			}
-//			p.sendMessage("isAdditionalSign: " + formatBoolean(LocketteAPI.isAdditionalSign(b)));
-//			if (LocketteAPI.isAdditionalSign(b)){
-//				p.sendMessage(" - isUserOnSign: " + formatBoolean(LocketteAPI.isUserOnSign(b, p.getName())));
-//			}
-//			p.sendMessage("isContainer: " + formatBoolean(LocketteAPI.isContainer(b)));
             p.sendMessage("Block: " + b.getType().toString() + " " + b.getTypeId() + ":" + b.getData());
 
-//			if (b.getType() == Material.WALL_SIGN){
-//				for (Object line : Reflection.signToBaseComponents(b)){
-//					Bukkit.broadcastMessage(line.toString());
-//				}
-//			}
             if (b.getType() == Material.WALL_SIGN) {
-//				List<Object> basecomponents = Reflection.signToBaseComponents(b);
-//				p.sendMessage("Text:Clickable:Hoverable");
-//				for (Object basecomponent : basecomponents){
-//					//p.sendMessage(ChatColor.RED + basecomponent.toString());
-//					p.sendMessage(ChatColor.YELLOW + Reflection.baseComponentToText(basecomponent) + ":" + Reflection.baseComponentToClickable(basecomponent) + ":" + Reflection.baseComponentToHoverable(basecomponent));
-//				}
                 for (String line : ((Sign) b.getState()).getLines()) {
                     p.sendMessage(ChatColor.GREEN + line);
                 }
-//				Object basecomponent = basecomponents.get(0);
-//				p.sendMessage(ChatColor.RED + basecomponent.toString());
-//				p.sendMessage(ChatColor.YELLOW + Reflection.baseComponentToText(basecomponent) + ":" + Reflection.baseComponentToClickable(basecomponent) + ":" + Reflection.baseComponentToHoverable(basecomponent));
-//				p.sendMessage(ChatColor.GREEN + ((Sign)b.getState()).getLines()[0]);
             }
             p.sendMessage(p.getUniqueId().toString());
-            //p.sendMessage(Utils.getUuidByUsernameFromMojang(p.getName()));
         }
     }
 

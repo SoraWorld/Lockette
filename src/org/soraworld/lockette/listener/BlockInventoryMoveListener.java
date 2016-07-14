@@ -1,4 +1,4 @@
-package org.soraworld.lockette;
+package org.soraworld.lockette.listener;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -10,6 +10,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.soraworld.lockette.api.LocketteAPI;
+import org.soraworld.lockette.config.Config;
+import org.soraworld.lockette.util.Utils;
 
 public class BlockInventoryMoveListener implements Listener {
 
@@ -23,8 +26,8 @@ public class BlockInventoryMoveListener implements Listener {
                 }
                 // Additional Hopper Minecart Check
                 if (event.getDestination().getHolder() instanceof HopperMinecart) {
-                    byte hopperminecartaction = Config.getHopperMinecartAction();
-                    switch (hopperminecartaction) {
+                    byte hopperMinecartAction = Config.getHopperMinecartAction();
+                    switch (hopperMinecartAction) {
                         // case 0 - Impossible
                         case (byte) 1: // Cancel only, it is not called if !Config.isItemTransferOutBlocked()
                             event.setCancelled(true);
@@ -52,7 +55,8 @@ public class BlockInventoryMoveListener implements Listener {
         }
         if (inventoryholder instanceof BlockState) {
             Block block = ((BlockState) inventoryholder).getBlock();
-            if (Config.isCacheEnabled()) { // Cache is enabled
+            if (Config.isCacheEnabled()) {
+                // Cache is enabled
                 if (Utils.hasValidCache(block)) {
                     return Utils.getAccess(block);
                 } else {

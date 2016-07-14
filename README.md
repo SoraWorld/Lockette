@@ -10,4 +10,4 @@
 
 1. 添加颜色
 2. [主人]Shiki [共有]Himmelt
-3. 为了识别颜色,需要使用Unicode转码
+3. 为了识别颜色,需要使用Unicode转码 // change '&' to '§' to add colors
