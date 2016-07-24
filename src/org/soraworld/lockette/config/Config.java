@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.soraworld.lockette.log.Logger;
 
 import java.io.File;
 import java.util.Collections;
@@ -62,6 +63,8 @@ public class Config {
         defaultPrivateSign = privateSignList.get(0);
         defaultMoresSign = moreSignList.get(0);
 
+        
+
         List<String> timerSignList = configFile.getStringList("timer-signs");
         List<String> timerSignList2 = timerSignList.stream().filter(timerString -> timerString.contains("@")).collect(Collectors.toList());
         timerSigns = new HashSet<>(timerSignList2);
@@ -69,8 +72,8 @@ public class Config {
         cacheTime = configFile.getInt("cache-time-seconds", 0) * 1000;
         enableCache = (configFile.getInt("cache-time-seconds", 0) > 0);
         if (enableCache) {
-            plugin.getLogger().info("You have cache enabled!");
-            plugin.getLogger().info("This is currently for experimental purpose only!");
+            Logger.info("You have cache enabled!");
+            Logger.info("This is currently for experimental purpose only!");
         }
 
         String blockHopperMinecartString = configFile.getString("block-hopper-minecart", "remove");
@@ -88,14 +91,14 @@ public class Config {
                 blockHopperMinecart = 2;
                 break;
         }
-        // 未处理的？
+        // 配置清单里的物品
         List<String> unprocessedItems = configFile.getStringList("lockables");
         lockables = new HashSet<>();
         for (String unprocessedItem : unprocessedItems) {
             if (unprocessedItem.equals("*")) {
                 Collections.addAll(lockables, Material.values());
-                plugin.getLogger().info("All blocks are default to be lockable!");
-                plugin.getLogger().info("Add '-<Material>' to exempt a block, such as '-STONE'!");
+                Logger.info("All blocks are default to be lockable!");
+                Logger.info("Add '-<Material>' to exempt a block, such as '-STONE'!");
                 continue;
             }
             boolean add = true;
@@ -115,7 +118,7 @@ public class Config {
                 // It is not really a number...
                 Material material = Material.getMaterial(unprocessedItem);
                 if (material == null) {
-                    plugin.getLogger().info(unprocessedItem + " is not an item!");
+                    Logger.info(unprocessedItem + " is not an item!");
                 } else {
                     if (add) {
                         lockables.add(material);
@@ -201,7 +204,7 @@ public class Config {
                     int seconds = Integer.parseInt(newMessage);
                     return Math.min(seconds, 20);
                 } catch (Exception ex) {
-                    plugin.getLogger().info(ex.toString());
+                    Logger.info(ex.toString());
                 }
             }
         }

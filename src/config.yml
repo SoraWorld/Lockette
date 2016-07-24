@@ -10,9 +10,9 @@ explosion-protection: true
 block-hopper-minecart: remove
 # ？？？？
 block-interfere-placement: true
-# 物品运输-进
+# 物品传输-保护进
 block-item-transfer-in: false
-# 物品运输-出
+# 物品传输-保护出
 block-item-transfer-out: true
 # 缓存（秒）
 cache-time-seconds: 0
